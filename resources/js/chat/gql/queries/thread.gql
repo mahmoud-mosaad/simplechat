@@ -1,0 +1,42 @@
+query thread($id: ID, $last: Int, $before: String){
+    thread(id: $id){
+        messages(last: $last, before: $before){
+            totalCount
+            edges {
+                node {
+                id
+                text
+                attachments
+                record
+                timestamp
+                thread{
+                    id
+                    name
+                    description
+                    type
+                    users{
+                    id
+                    name
+                    email
+                    hash
+                    avatar
+                    }
+                }
+                author{
+                    id
+                    name
+                    email
+                    hash
+                    avatar
+                }
+                }
+                cursor
+            }
+            pageInfo {
+                startCursor
+                endCursor
+                hasNextPage
+            }
+        } 
+    }
+}

@@ -1,0 +1,58 @@
+query user($id: ID, $last: Int, $before: String){
+    user(id: $id){
+        id
+        name
+        email
+        avatar
+        hash
+        threads{
+            # id
+            # name
+            # description
+            # type
+            # users{
+            #     id
+            #     name
+            #     avatar
+            # }
+            messages(last: $last, before: $before){
+                totalCount
+                edges {
+                    node {
+                        id
+                        text
+                        attachments
+                        record
+                        timestamp
+                        thread{
+                            id
+                            name
+                            description
+                            type
+                            users{
+                                id
+                                name
+                                email
+                                hash
+                                avatar
+                            }
+                        }
+                        author{
+                            id
+                            name
+                            email
+                            hash
+                            avatar
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    startCursor
+                    endCursor
+                    hasNextPage
+                }
+            }
+        }
+    }
+}

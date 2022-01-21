@@ -1,0 +1,50 @@
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+type Query {
+    users: [User!]! @all
+    user(_id: ID @eq): User @find
+    threads: [Thread!]! @all
+    thread(_id: ID @eq): Thread @find
+    messages: [Message!]! @paginate(defaultCount: 5)
+    message(_id: ID @eq): Message @find
+}
+
+type User {
+    _id: ID!
+    name: String!
+    email: String!
+    hash: String!
+    avatar: String!
+    messages: [Message!]! @hasMany
+    threads: [Thread!]! @belongsToMany
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+
+type Thread {
+    _id: ID!
+    name: String
+    description: String
+    type: String!
+    users: [User]! @belongsToMany
+    messages: [Message!]! @hasMany
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Message {
+    _id: ID!
+    text: String
+    timestamp: Int!
+    attachments: String
+    record: String
+    author: User! @belongsTo
+    thread: Thread! @belongsTo
+    created_at: DateTime
+    updated_at: DateTime
+}
