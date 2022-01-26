@@ -19,6 +19,7 @@ export const getAuthUserData = ({ commit }) => {
 }
 
 export const getChatData = ({ commit }) => {
+    console.log('begin sdgfsdfhsdgf')
     api.getAuthUserData(authUserData => {
         commit('receiveAuthUserData', authUserData)
         // commit('setAuthUserData', authUser)
