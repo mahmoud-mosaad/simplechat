@@ -67,6 +67,9 @@ export function getAuthUserData (cb) {
             .then(response => {
                 var authUser = response.data
 
+                console.log('sdjfksdhfkhdsjkfhsdhfjk')
+                console.log(authUser)
+
                 axios
                     .post(axiosURLNode('graphql'), 
                         {
