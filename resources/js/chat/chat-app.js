@@ -61,16 +61,16 @@ Vue.use(Vuex)
 
 const options = { transports: ['websocket', 'polling', 'flashsocket'] }
 
-Vue.use(new VueSocketIO({
-        debug: true,
-        connection: SocketIO(process.env.NODE_URL, options), //options object is Optional
-        vuex: {
-            store,
-            actionPrefix: "SOCKET_",
-            mutationPrefix: "SOCKET_"
-        }
-    })
-);
+// Vue.use(new VueSocketIO({
+//         debug: true,
+//         connection: SocketIO(process.env.NODE_URL, options), //options object is Optional
+//         vuex: {
+//             store,
+//             actionPrefix: "SOCKET_",
+//             mutationPrefix: "SOCKET_"
+//         }
+//     })
+// );
 
 Vue.mixin(mixins)
 
