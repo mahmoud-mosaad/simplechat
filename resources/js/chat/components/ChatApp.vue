@@ -17,28 +17,33 @@
             <!-- Start side-menu nav -->
             <div class="flex-lg-column my-auto">
                 <ul class="nav nav-pills side-menu-nav justify-content-center" role="tablist">
+                    <li v-if="makingCall" class="nav-item">
+                        <a @click="showCall" class="nav-link call" id="call-tab" href="#">
+                            <i class="ri-phone-line"></i>
+                        </a>
+                    </li>
                     <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Profile">
-                        <a class="nav-link" id="pills-user-tab" data-bs-toggle="pill" href="#pills-user" role="tab">
+                        <a @click="hideCall" class="nav-link" id="pills-user-tab" data-bs-toggle="pill" href="#pills-user" role="tab">
                             <i class="ri-user-2-line"></i>
                         </a>
                     </li>
                     <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="الرسائل">
-                        <a class="nav-link active" id="pills-chat-tab" data-bs-toggle="pill" href="#pills-chat" role="tab">
+                        <a @click="hideCall" class="nav-link active" id="pills-chat-tab" data-bs-toggle="pill" href="#pills-chat" role="tab">
                             <i class="ri-message-3-line"></i>
                         </a>
                     </li>
                     <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="المجموعات">
-                        <a class="nav-link" id="pills-groups-tab" data-bs-toggle="pill" href="#pills-groups" role="tab">
+                        <a @click="hideCall" class="nav-link" id="pills-groups-tab" data-bs-toggle="pill" href="#pills-groups" role="tab">
                             <i class="ri-group-line"></i>
                         </a>
                     </li>
                     <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="الأفراد">
-                        <a class="nav-link" id="pills-contacts-tab" data-bs-toggle="pill" href="#pills-contacts" role="tab">
+                        <a @click="hideCall" class="nav-link" id="pills-contacts-tab" data-bs-toggle="pill" href="#pills-contacts" role="tab">
                             <i class="ri-contacts-line"></i>
                         </a>
                     </li>
                     <li class="nav-item" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Settings">
-                        <a class="nav-link" id="pills-setting-tab" data-bs-toggle="pill" href="#pills-setting" role="tab">
+                        <a @click="hideCall" class="nav-link" id="pills-setting-tab" data-bs-toggle="pill" href="#pills-setting" role="tab">
                             <i class="ri-settings-2-line"></i>
                         </a>
                     </li>
@@ -76,7 +81,7 @@
         <!-- end left sidebar-menu -->
 
         <!-- start chat-leftsidebar -->
-        <div class="chat-leftsidebar me-lg-1 ms-lg-0">
+        <div v-if="!showCallTab" class="chat-leftsidebar me-lg-1 ms-lg-0">
 
             <div class="tab-content">
 
@@ -647,8 +652,13 @@
         <!-- end chat-leftsidebar -->
 
         <!-- Start User chat -->
-        <chat-section></chat-section>
+        <chat-section v-if="!showCallTab"></chat-section>
         <!-- end  layout wrapper -->
+
+        <!-- Call Window -->
+
+        <call-section v-if="showCallTab"></call-section>
+
     </div>
 
 </template>
@@ -660,6 +670,7 @@
     import GroupSection from './GroupSection.vue'
     import ChatSection from './ChatSection.vue'
     import ThreadActive from './ThreadActive.vue'
+    import CallSection from './CallSection.vue'
     import carousel from 'vue-owl-carousel'
     import { mapGetters, mapActions } from 'vuex'
 
@@ -768,6 +779,12 @@
                     dispatch('removeActiveThread', {
                         user
                     })
+                },
+                showCall(dispatch){
+                    dispatch('showCall')
+                },
+                hideCall(dispatch){
+                    dispatch('hideCall')
                 }
             }),
         },
@@ -777,6 +794,9 @@
             },
         },
         computed: {
+            makingCall(){
+                return this.$store.state.makingCall
+            },
             authUser(){
                 return this.$store.state.authUser
             },
@@ -786,6 +806,12 @@
             firstCharacterOfName: function(){
                 return this.authUser.name[0].toUpperCase()
             },
+            makingCall(){
+                return this.$store.state.makingCall
+            },
+            showCallTab(){
+                return this.$store.state.showCallTab
+            },
             ...mapGetters(['activeThreads'])
         },
         components: {
@@ -794,6 +820,7 @@
             'group-section': GroupSection,
             'chat-section': ChatSection,
             'thread-active': ThreadActive,
+            'call-section': CallSection,
             'carousel': carousel,
         },
         mounted(){
@@ -822,5 +849,10 @@
 </script>
 
 <style lang="scss">
+
+    .side-menu-nav .nav-item .nav-link.call {
+        background-color: #F9EBEA;
+        color: #E6B0AA;
+    }
 
 </style>

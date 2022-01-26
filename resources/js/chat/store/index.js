@@ -25,6 +25,21 @@ const state = {
     filteredUserThreads: {},
     filteredGroupThreads: {},
     subscribedThreads: [],
+    makingCall: false,
+    showCallTab: false,
+    callInfo: {
+        threadId: '',
+        options: {
+            video: false,
+            audio: false
+        },
+        established: false,
+        status: {
+            video: false,
+            audio: false
+        },
+        peers: 0
+    },
     activeThreads: [
         // {
         //     id: 1,

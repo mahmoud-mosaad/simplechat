@@ -86,6 +86,60 @@ export default {
 
   },
 
+  startCall (state, {options, threadId}) {
+    state.makingCall = true
+    state.showCallTab = true
+    state.callInfo = {
+      options: options,
+      threadId: threadId,
+      established: false,
+      status: options,
+      peers: 0
+    }
+  },
+
+  establishCall (state) {
+    state.callInfo.established = true
+  },
+
+  endCall (state) {
+    state.makingCall = false
+    state.showCallTab = false
+    state.callInfo = {
+      threadId: '',
+      options: {
+          video: false,
+          audio: false
+      },
+      established: false,
+      status: {
+        video: false,
+        audio: false
+      },
+      peers: 0
+    }
+  },
+
+  increaseCallPeers(state){
+    state.callInfo.peers++
+  },
+
+  toggleCallAudio (state) {
+    state.callInfo.status.audio = !state.callInfo.status.audio
+  },
+
+  toggleCallVideo (state) {
+    state.callInfo.status.video = !state.callInfo.status.video
+  },
+
+  showCall (state) {
+    state.showCallTab = true
+  },
+
+  hideCall (state) {
+    state.showCallTab = false
+  },
+
   recieveMessage (state, message) {
     addMessage(state, message)
   },

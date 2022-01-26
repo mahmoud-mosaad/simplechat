@@ -2,6 +2,12 @@ export const threads = state => state.threads
 
 export const contacts = state => state.contacts
 
+export const makingCall = state => state.makingCall
+
+export const showCallTab = state => state.showCallTab
+
+export const callInfo = state => state.callInfo
+
 export const currentThread = state => {
   return state.currentThreadID
     ? state.threads[state.currentThreadID]

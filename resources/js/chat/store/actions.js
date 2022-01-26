@@ -134,3 +134,35 @@ export const filterThreads = ({commit}, payload) =>
             commit('filterGroupThreads', filteredResult)
     })
 }
+
+export const startCall = ({commit}, payload) => {
+    commit('startCall', payload)
+}
+
+export const endCall = ({commit}) => {
+    commit('endCall')
+}
+
+export const toggleCallAudio = ({commit}) => {
+    commit('toggleCallAudio')
+}
+
+export const toggleCallVideo = ({commit}) => {
+    commit('toggleCallVideo')
+}
+
+export const establishCall = ({commit}) => {
+    commit('establishCall')
+}
+
+export const increaseCallPeers = ({commit}) => {
+    commit('increaseCallPeers')
+}
+
+export const showCall = ({commit}) => {
+    commit('showCall')
+}
+
+export const hideCall = ({commit}) => {
+    commit('hideCall')
+}

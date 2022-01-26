@@ -29,6 +29,8 @@
         <link href="{{ asset('messenger2/app-rtl.min.css') }}" rel="stylesheet" type="text/css">
         <!-- <link href="{{ asset('messenger2/app-dark.min.css') }}" rel="stylesheet" type="text/css"> -->
 
+        <link href="{{ asset('messenger2/all.min.css') }}" rel="stylesheet" type="text/css">
+
         <script>
 
             window._asset = '{{ asset('') }}';

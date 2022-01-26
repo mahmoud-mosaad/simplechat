@@ -37,6 +37,18 @@
                             </div>
                         </li> -->
 
+                        <li v-if="!makingCall" class="list-inline-item">
+                            <button @click="startCall(false)" type="button" class="btn nav-btn"> <!-- data-bs-toggle="modal" data-bs-target="#audiocallModal" -->
+                                <i class="ri-phone-line"></i>
+                            </button>
+                        </li>
+
+                        <li v-if="!makingCall" class="list-inline-item"> <!--  d-none d-lg-inline-block me-2 ms-0 -->
+                            <button @click="startCall(true)" type="button" class="btn nav-btn"> <!--   data-bs-toggle="modal" data-bs-target="#videocallModal" -->
+                                <i class="ri-vidicon-line"></i>
+                            </button>
+                        </li>
+
                         <li class="list-inline-item"><!--  d-none d-lg-inline-block me-2 ms-0 -->
                             <button @click="showProfile" type="button" class="btn nav-btn user-profile-show">
                                 <i class="ri-user-2-line"></i>
@@ -121,7 +133,7 @@
             <div class="row g-0">
 
                 <div class="col">
-                    <input v-model="message" @keyup.enter="sendMessage" @input="currentThread && currentThread.type == 'user' ? startTyping : null" @blur="currentThread && currentThread.type == 'user' ? stopTyping : null"  type="text" class="form-control form-control-lg bg-light border-light" placeholder="إدخل رسالتك...">
+                    <input v-model="message" @keyup.enter="sendMessage" @input="startTyping" @blur="stopTyping"  type="text" class="form-control form-control-lg bg-light border-light" placeholder="إدخل رسالتك...">
                 </div>
                 <div class="col-auto">
                     <div class="chat-input-links ms-md-2 me-md-0">
@@ -193,6 +205,48 @@
             </div>
         </div>
         <!-- end chat input section -->
+
+
+
+        <!-- call Modal -->
+        <div class="modal fade" ref="callModal" id="audiocallModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="text-center p-4">
+                            <div class="avatar-lg mx-auto mb-4">
+                                <!-- <img src="./avatar-4.jpg" alt="" class="img-thumbnail rounded-circle"> -->
+                            </div>
+
+                            <h5 class="text-truncate">Doris Brown</h5>
+                            <p v-if="requestedCall.options" class="text-muted">Start {{ requestedCall.options.video ? 'Video' : 'Audio' }} Call</p>
+
+                            <div class="mt-5">
+                                <ul class="list-inline mb-1">
+                                    <li class="list-inline-item px-2 me-2 ms-0">
+                                        <button type="button" @click="refuseCallInfo(requestedCall)" class="btn btn-danger avatar-sm rounded-circle" data-bs-dismiss="modal">
+                                            <span class="avatar-title bg-transparent font-size-20">
+                                                <i class="ri-close-fill"></i>
+                                            </span>
+                                        </button>
+                                    </li>
+                                    <li class="list-inline-item px-2">
+                                        <button type="button" @click="acceptCallInfo(requestedCall)" class="btn btn-success avatar-sm rounded-circle">
+                                            <span class="avatar-title bg-transparent font-size-20">
+                                                <i v-if="requestedCall.options" :class="requestedCall.options.video ? 'ri-vidicon-fill' : 'ri-phone-fill'"></i>
+                                            </span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>                        
+                </div>
+            </div>
+        </div>
+        <!-- end call modal -->
+
+
     </div>
     <!-- end chat conversation section -->
 
@@ -204,7 +258,8 @@
     import MessageWrapper from './MessageWrapper.vue'
     import AudioPlayer from './AudioPlayer.vue'
     import VoiceRecorder from "./VoiceRecorder.vue"
-    import InfiniteLoading from 'vue-infinite-loading';
+    import InfiniteLoading from 'vue-infinite-loading'
+    import {Howl, Howler} from 'howler'
     import data from "emoji-mart-vue-fast/data/all.json"
     import "emoji-mart-vue-fast/css/emoji-mart.css"
     import { Picker, EmojiIndex } from "emoji-mart-vue-fast"
@@ -223,6 +278,8 @@
                     photos: [],
                     files: []
                 },
+                requestedCall: {},
+                callSound: {},
                 audioInitiated: false,
                 audioRecorded: false,
                 voiceRecorded: {
@@ -248,7 +305,32 @@
             },
             stopTyping: function (data) {
                 this.removeUserTyping(data)
-            }
+            },
+            requestCall: function (callInfo){
+                this.requestedCall = callInfo
+                this.callSound = new Howl({
+                    src: '/ding.mp3',
+                    autoplay: true,
+                    loop: true,
+                    volume: 0.5,
+                    onend: function() {
+                        // console.log('Finished!');
+                    }
+                })
+                this.callSound.play()
+                $(this.$refs.callModal).modal('show')
+            },
+            refuseCall: function (callInfo){
+                this.receiveRefusedCall(callInfo)
+            },
+            endCall: function (callInfo){
+                this.receiveRefusedCall(callInfo)
+                this.callSound.stop()
+                $(this.$refs.callModal).modal('hide')
+            },
+            acceptCall: function (callInfo){
+                this.receiveAcceptedCall(callInfo)
+            },
         },
         components: {
             'message-wrapper': MessageWrapper,
@@ -319,6 +401,9 @@
             },
             threadUser(){
                 return !this.currentThread ? null : (this.authUser.id == this.currentThread.users[0].id ? this.currentThread.users[1] : this.currentThread.users[0])
+            },
+            makingCall(){
+                return this.$store.state.makingCall
             },
             ...mapGetters({
                 thread: 'currentThread',
@@ -412,11 +497,12 @@
                 this.emojisOutput = this.emojisOutput + emoji.native;
             },
             startTyping(){
-                console.log('starting..............')
-                this.$socket.emit('startTyping', {thread: this.currentThread, user: this.authUser})
+                if (this.currentThread && this.currentThread.type == 'user')
+                    this.$socket.emit('startTyping', {thread: this.currentThread, user: this.authUser})
             },
             stopTyping(){
-                this.$socket.emit('stopTyping', {thread: this.currentThread, user: this.authUser})
+                if (this.currentThread && this.currentThread.type == 'user')
+                    this.$socket.emit('stopTyping', {thread: this.currentThread, user: this.authUser})
             },
             initRecordAudio(){
                 this.audioInitiated = true
@@ -480,6 +566,11 @@
                         this.createdMessageInfo = response.data
                     ))
             },
+            refuseCallInfo (callInfo){
+                this.$socket.emit('refuseCall', callInfo)
+                this.requestedCall = {}
+                this.callSound.stop()
+            },
             ...mapActions({
                 loadMoreThreadMessages (dispatch, data) {
                     dispatch('recievePreviousPagedMessages', data)
@@ -512,9 +603,6 @@
 
                 },
                 recieveMessage (dispatch, data) {
-
-                    console.log(data)
-
                     dispatch('sendMessage', {
                         id: data.id,
                         text: data.text,
@@ -532,7 +620,7 @@
                     await this.saveMessageToDB('', {}, voiceRecorded, currentThread)
                     const messageBody = {
                         id: this.createdMessageInfo.id,
-                        timestamp: Date.parse(this.createdMessageInfo.timestamp),
+                        timestamp: this.createdMessageInfo.timestamp,
                         text: '',
                         thread: currentThread,
                         author: authUser,
@@ -573,6 +661,28 @@
                         user: data.user,
                     })
 
+                },
+                startCall(dispatch, video){
+                    dispatch('startCall', {
+                        options: {
+                            audio: true,
+                            video: video
+                        },
+                        threadId: this.currentThreadID
+                    })
+                },
+                acceptCallInfo (dispatch, callInfo){
+                    this.callSound.stop()
+                    dispatch('startCall', callInfo)
+                    this.$socket.emit('acceptCall', callInfo)
+                },
+                receiveRefusedCall (dispatch, callInfo){
+                    dispatch('endCall', callInfo)
+                    this.requestedCall = {}
+                },
+                receiveAcceptedCall (dispatch, callInfo){
+                    dispatch('establishCall', callInfo)
+                    this.$socket.emit('newPeer')
                 },
             }),
             ...mapActions(['returnToThread', 'showProfile', 'toggleEmojiPicker', 'showEmojiPicker', 'hideEmojiPicker'])
