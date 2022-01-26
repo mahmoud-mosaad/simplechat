@@ -62,6 +62,9 @@ export function getAllContacts (cb) {
 
 export function getAuthUserData (cb) {
     setTimeout(() => {
+
+        console.log('ashdjkahskjdhkashdjkashdjkhaskjdhkjashdksad first log')
+
         axios
             .get(axiosURL('api/authuser'))
             .then(response => {
