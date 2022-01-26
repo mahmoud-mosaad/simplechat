@@ -63,7 +63,7 @@ const options = { transports: ['websocket', 'polling', 'flashsocket'] }
 
 Vue.use(new VueSocketIO({
         debug: true,
-        connection: SocketIO('http://localhost:3000', options), //options object is Optional
+        connection: SocketIO(process.env.NODE_URL, options), //options object is Optional
         vuex: {
             store,
             actionPrefix: "SOCKET_",
