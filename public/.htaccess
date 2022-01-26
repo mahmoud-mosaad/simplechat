@@ -3,6 +3,13 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    <IfModule mod_headers.c>
+        Header set Access-Control-Allow-Origin "*"
+    </IfModule>
+    <FilesMatch ".(eot|ttf|otf|woff|mp3|mp4)">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+
     RewriteEngine On
 
     # Handle Authorization Header
