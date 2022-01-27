@@ -7,6 +7,8 @@ function rand(){
 }
 
 function axiosURL(url){
+    axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+    axios.defaults.headers.common['Content-Type'] = 'application/json'
     axios.defaults.headers.common['X-CSRF-TOKEN'] = document.getElementsByName('csrf-token')[0].getAttribute('content')
     return (window._backpack_url || '') + '/' + url
 }
@@ -63,12 +65,7 @@ export function getAllContacts (cb) {
 export function getAuthUserData (cb) {
     setTimeout(() => {
         axios
-            .get(axiosURL('api/authuser'), {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json',
-                  },
-            })
+            .get(axiosURL('api/authuser'))
             .then(response => {
                 var authUser = response.data
 
