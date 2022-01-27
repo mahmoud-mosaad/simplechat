@@ -14,6 +14,8 @@ function axiosURL(url){
 }
 
 function axiosURLNode(url){
+    axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+    axios.defaults.headers.common['Content-Type'] = 'application/json'
     axios.defaults.headers.common['X-CSRF-TOKEN'] = document.getElementsByName('csrf-token')[0].getAttribute('content')
     return ('http://simplechatcore.herokuapp.com' || '') + '/' + url
     // http://localhost:3000
@@ -68,9 +70,6 @@ export function getAuthUserData (cb) {
             .get(axiosURL('api/authuser'))
             .then(response => {
                 var authUser = response.data
-
-                console.log('sdjfksdhfkhdsjkfhsdhfjk')
-                console.log(authUser)
 
                 axios
                     .post(axiosURLNode('graphql'), 
