@@ -15,7 +15,7 @@ function axiosURL(url){
 
 function axiosURLNode(url){
     axios.defaults.headers.common['X-CSRF-TOKEN'] = document.getElementsByName('csrf-token')[0].getAttribute('content')
-    return ('https://simplechatcore.herokuapp.com' || '') + '/' + url
+    return ('http://simplechatcore.herokuapp.com' || '') + '/' + url
     // http://localhost:3000
 }
 
