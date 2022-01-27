@@ -62,11 +62,13 @@ export function getAllContacts (cb) {
 
 export function getAuthUserData (cb) {
     setTimeout(() => {
-
-        console.log('ashdjkahskjdhkashdjkashdjkhaskjdhkjashdksad first log')
-
         axios
-            .get(axiosURL('api/authuser'))
+            .get(axiosURL('api/authuser'), {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                  },
+            })
             .then(response => {
                 var authUser = response.data
 
